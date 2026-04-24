@@ -145,7 +145,7 @@ def get_game_data(game_data:dict):
                 for li in info_list.find_all("li"):
                     li_strong = li.find("strong")
                     if li_strong:
-                        if "game size" in li_strong.text.lower():
+                        if "game size:" in li_strong.text.lower():
                             fileSize = li.text.split(": ")[-1]
 
             descriptionHtml = str(soup.find("article", id="the-post"))
@@ -207,7 +207,7 @@ with Progress(
             future.result()
             game_progress.update(task, advance=1)
 
-console.print(f"Finished scrapping all game data with {len(hydra_format['downloads'])} game stuff.", style="green", markup=False)
+console.print(f"Finished scrapping all game data with {len(hydra_format['downloads'])}/{len(page_game_data_list)} game stuff.", style="green", markup=False)
 
 with open("sources/steamrip.com_source.json", "w") as f:
     json.dump(hydra_format, f, indent=4)
