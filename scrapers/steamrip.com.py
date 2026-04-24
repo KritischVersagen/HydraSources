@@ -129,11 +129,11 @@ def get_game_data(game_data:dict):
             descriptionHtml = ""
             uris = []
 
-            console.print(f"Getting game page: {title}", style="cyan", markup=False)
+            #console.print(f"Getting game page: {title}", style="cyan", markup=False)
             res = scrapper.get(repackLinkSource)
             res.raise_for_status()
 
-            console.print(f"Finding game data: {title}", style="cyan", markup=False)
+            #console.print(f"Finding game data: {title}", style="cyan", markup=False)
             soup = BeautifulSoup(res.content, "html.parser")
             post_meta_tag = soup.find_all("div", class_="single-post-meta")[0]
             if post_meta_tag:
@@ -172,7 +172,7 @@ def get_game_data(game_data:dict):
                 f.write(res.text)
             '''
 
-            console.print(f"Got game data: {title}", style="green", markup=False)
+            #console.print(f"Got game data: {title}", style="green", markup=False)
             return
         except Exception as e:
             console.print(f"Had an error with game: {title}\n{e}", style="red", markup=False)
