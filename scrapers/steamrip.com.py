@@ -146,7 +146,15 @@ def get_game_data(game_data:dict):
                     li_strong = li.find("strong")
                     if li_strong:
                         if "game size:" in li_strong.text.lower():
-                            fileSize = li.text.split(": ")[-1]
+                            fileSizeRaw = li.text.replace("\xa0", " ")
+
+                            match = re.search(r'(\d+(?:\.\d+)?\+?)\s*(kb|mb|gb|tb)\b', fileSizeRaw, re.IGNORECASE)
+
+                            if match:
+                                fileSize = f"{match.group(1)} {match.group(2).upper()}"
+                            else:
+                                # print(title)
+                                fileSize = "N/A"
 
             descriptionHtml = str(soup.find("article", id="the-post"))
 

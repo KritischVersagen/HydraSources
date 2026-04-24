@@ -145,14 +145,15 @@ def get_game_data(game_data:dict):
                     li_strong = li.find("strong")
                     if li_strong:
                         if "storage:" == li_strong.text.lower():
-                            fileSizeRaw = li.text
-                            match = re.search(r'(\d+(?:\.\d+)?)\s*(kb|mb|gb|tb)', fileSizeRaw, re.IGNORECASE)
+                            fileSizeRaw = li.text.replace("\xa0", " ")
+
+                            match = re.search(r'(\d+(?:\.\d+)?\+?)\s*(kb|mb|gb|tb)\b', fileSizeRaw, re.IGNORECASE)
 
                             if match:
                                 fileSize = f"{match.group(1)} {match.group(2).upper()}"
                             else:
-                                fileSize = None
-
+                                #print(title)
+                                fileSize = "N/A"
 
             descriptionHtml = str(soup.find("div", class_="article-content"))
 
