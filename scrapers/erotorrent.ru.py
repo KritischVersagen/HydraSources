@@ -24,7 +24,7 @@ retries = 5
 game_urls = []
 
 hydra_source_format = {
-    "name": "Erotorrent.ru",
+    "name": "Erotorrent.ru | Kritisch Rescrape",
     "downloads": []
 }
 

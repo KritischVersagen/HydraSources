@@ -10,6 +10,7 @@ import cloudscraper
 
 from bs4 import BeautifulSoup
 from rich.console import Console
+from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, TimeElapsedColumn
 
 console = Console()
 
@@ -188,13 +189,23 @@ while True:
 
 console.print("Scrapped all game urls, now scrapping game data...", style="cyan", markup=False)
 
-with ThreadPoolExecutor(max_workers=10) as executor:
-    futures = []
-    for game in page_game_data_list:
-        futures.append(executor.submit(get_game_data, game))
+with Progress(
+    SpinnerColumn(),
+    BarColumn(),
+    TextColumn("Games [{task.completed}/{task.total}]"),
+    TimeElapsedColumn(),
+) as game_progress:
 
-    for future in as_completed(futures):
-        future.result()
+    task = game_progress.add_task("games", total=len(page_game_data_list))
+
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        futures = []
+        for game in page_game_data_list:
+            futures.append(executor.submit(get_game_data, game))
+
+        for future in as_completed(futures):
+            future.result()
+            game_progress.update(task, advance=1)
 
 console.print(f"Finished scrapping all game data with {len(hydra_format['downloads'])} game stuff.", style="green", markup=False)
 
