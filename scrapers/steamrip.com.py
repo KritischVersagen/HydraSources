@@ -22,7 +22,7 @@ max_retries = 10
 hit_404 = False
 page_game_data_list = []
 hydra_format = {
-    "name": "SteamRip.com",
+    "name": "SteamRip.com | Kritisch Rescrape",
     "downloads": []
 }
 
@@ -196,7 +196,7 @@ with ThreadPoolExecutor(max_workers=10) as executor:
     for future in as_completed(futures):
         future.result()
 
-console.print("Finished scrapping all game data", style="green", markup=False)
+console.print(f"Finished scrapping all game data with {len(hydra_format['downloads'])} game stuff.", style="green", markup=False)
 
 with open("sources/steamrip.com_source.json", "w") as f:
     json.dump(hydra_format, f, indent=4)
