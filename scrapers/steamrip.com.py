@@ -197,23 +197,27 @@ while True:
 
 console.print("Scrapped all game urls, now scrapping game data...", style="cyan", markup=False)
 
-with Progress(
-    SpinnerColumn(),
-    BarColumn(),
-    TextColumn("Games [{task.completed}/{task.total}]"),
-    TimeElapsedColumn(),
-) as game_progress:
+total = len(page_game_data_list)
 
-    task = game_progress.add_task("games", total=len(page_game_data_list))
+console.print(f"Processing {total} games...", style="cyan")
 
-    with ThreadPoolExecutor(max_workers=10) as executor:
-        futures = []
-        for game in page_game_data_list:
-            futures.append(executor.submit(get_game_data, game))
+with ThreadPoolExecutor(max_workers=10) as executor:
+    futures = {
+        executor.submit(get_game_data, game): game
+        for game in page_game_data_list
+    }
 
-        for future in as_completed(futures):
+    completed = 0
+
+    for future in as_completed(futures):
+        game = futures[future]
+
+        try:
             future.result()
-            game_progress.update(task, advance=1)
+            completed += 1
+            console.print(f"[{completed}/{total}] Finished: {game}", style="green")
+        except Exception as e:
+            console.print(f"Failed: {game} -> {e}", style="red")
 
 console.print(f"Finished scrapping all game data with {len(hydra_format['downloads'])}/{len(page_game_data_list)} game stuff.", style="green", markup=False)
 

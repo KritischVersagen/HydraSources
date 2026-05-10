@@ -216,25 +216,38 @@ console.print(f"Pages found: {last_page}", style="green")
 def fetch_page(i):
     return search(i)
 
-with Progress(
-    SpinnerColumn(),
-    BarColumn(),
-    TextColumn("Pages [{task.completed}/{task.total}]"),
-    TimeElapsedColumn(),
-) as page_progress:
+total = last_page
 
-    task = page_progress.add_task("pages", total=last_page)
+console.print(f"Fetching {total} pages...", style="cyan")
 
-    with ThreadPoolExecutor(max_workers=5) as executor:
-        futures = {executor.submit(fetch_page, i): i for i in range(1, last_page + 1)}
+with ThreadPoolExecutor(max_workers=5) as executor:
+    futures = {
+        executor.submit(fetch_page, i): i
+        for i in range(1, last_page + 1)
+    }
 
-        for future in as_completed(futures):
-            try:
-                game_urls.extend(future.result())
-            except:
-                pass
+    completed = 0
 
-            page_progress.update(task, advance=1)
+    for future in as_completed(futures):
+        page_num = futures[future]
+
+        try:
+            results = future.result()
+
+            if results:
+                game_urls.extend(results)
+
+            completed += 1
+
+            console.print(
+                f"[{completed}/{total}] "
+                f"Page {page_num} complete "
+                f"({len(results) if results else 0} games)",
+                style="green"
+            )
+
+        except Exception as e:
+            console.print(f"::warning::Page {page_num} failed: {e}", style="red")
 
 # ----------------------
 # GAME SCRAPING
@@ -242,30 +255,27 @@ with Progress(
 
 console.print(f"Games found: {len(game_urls)}", style="cyan")
 
-def fetch_game(game):
-    return get_game_data(game)
+total = len(game_urls)
 
-with Progress(
-    SpinnerColumn(),
-    BarColumn(),
-    TextColumn("Games [{task.completed}/{task.total}]"),
-    TimeElapsedColumn(),
-) as game_progress:
+console.print(f"Processing {total} games...", style="cyan")
 
-    task = game_progress.add_task("games", total=len(game_urls))
+with ThreadPoolExecutor(max_workers=10) as executor:
+    futures = {
+        executor.submit(get_game_data, game): game
+        for game in game_urls
+    }
 
-    with ThreadPoolExecutor(max_workers=5) as executor:
-        futures = [executor.submit(fetch_game, g) for g in game_urls]
+    completed = 0
 
-        for future in as_completed(futures):
-            try:
-                results = future.result()
-                for r in results:
-                    hydra_source_format["downloads"].append(r)
-            except:
-                pass
+    for future in as_completed(futures):
+        game = futures[future]
 
-            game_progress.update(task, advance=1)
+        try:
+            future.result()
+            completed += 1
+            console.print(f"[{completed}/{total}] Finished: {game}", style="green")
+        except Exception as e:
+            console.print(f"Failed: {game} -> {e}", style="red")
 
 # ----------------------
 # SAVE OUTPUT
