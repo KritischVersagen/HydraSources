@@ -2,3 +2,6 @@ cloudscraper
 bs4
 rich
 requests
+njsparser
+ratelimit
+tenacity
