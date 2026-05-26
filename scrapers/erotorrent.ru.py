@@ -281,7 +281,10 @@ with ThreadPoolExecutor(max_workers=10) as executor:
 # SAVE OUTPUT
 # ----------------------
 
-with open("sources/erotorrent.ru_source.json", "w") as f:
-    json.dump(hydra_source_format, f, indent=4)
+if len(hydra_format["downloads"]) >= 50:
+    with open("sources/erotorrent.ru_source.json", "w") as f:
+        json.dump(hydra_source_format, f, indent=4)
+else:
+    console.print(f"Didn't fully scrape so not saving...", style="green", markup=False)
 
 console.print("Done!", style="green")

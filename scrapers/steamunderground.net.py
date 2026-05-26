@@ -217,5 +217,8 @@ with ThreadPoolExecutor(max_workers=10) as executor:
 
 console.print(f"Finished scrapping all game data with {len(hydra_format['downloads'])}/{len(page_game_data_list)} game stuff.", style="green", markup=False)
 
-with open("sources/steamunderground.net_source.json", "w") as f:
-    json.dump(hydra_format, f, indent=4)
+if len(hydra_format["downloads"]) >= 50:
+    with open("sources/steamunderground.net_source.json", "w") as f:
+        json.dump(hydra_format, f, indent=4)
+else:
+    console.print(f"Didn't fully scrape so not saving...", style="green", markup=False)
